@@ -1,5 +1,9 @@
-# Hobby
+# Hobby-project for self-improvement
 
-## by MaxQNEI <maxqnei@gmail.com>
+@Author MaxQNEI
 
-### Without description. (temporarily)
+-   [GMail](maxqnei@gmail.com)
+-   [LinkedIn](https://www.linkedin.com/in/maxqnei/)
+-   [Telegram](https://t.me/maxqnei)
+
+The description is temporarily unavailable.
