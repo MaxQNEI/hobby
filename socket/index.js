@@ -7,6 +7,7 @@ const port = 8283;
 const info = {
     connections: 0,
     connectsTime: {},
+    codes: {},
 };
 
 io.on("connection", (socket) => {
@@ -17,6 +18,8 @@ io.on("connection", (socket) => {
     console.log(`[Socket${_getLogin()}] Connected.`, socket.handshake.auth.token);
 
     let token = socket.handshake.auth.token || uuid();
+    let code = "",
+        symbolWait;
 
     info.connections++;
     info.connectsTime[token] = {
@@ -36,6 +39,31 @@ io.on("connection", (socket) => {
         };
 
         io.emit("info", info);
+    });
+
+    socket.on("symbol", (symbol) => {
+        console.log(`[Socket${_getLogin()}] Symbol: ${symbol}`);
+
+        symbolWait && clearTimeout(symbolWait);
+
+        code = (code + symbol.toString()).substr(0, 6);
+        if (code.length < 6) {
+            symbolWait = setTimeout(() => {
+                code = "";
+                socket.emit("code", code);
+            }, 2000);
+        } else {
+            symbolWait = setTimeout(() => {
+                info.codes[code] = (info.codes[code] || 0) + 1;
+                io.emit("info", info);
+                socket.emit("code", code, true);
+
+                code = "";
+                socket.emit("code", code);
+            }, 500);
+        }
+
+        socket.emit("code", code);
     });
 });
 

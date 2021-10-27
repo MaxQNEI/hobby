@@ -1,24 +1,80 @@
 <script>
+    import { onMount } from "svelte";
     import { Socket, Connected } from "./store/socket";
+
+    const symbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
 
     let infoConnections;
     let infoConnects;
+    let infoCodes = 0;
+    let infoCodeAttempts = 0;
+    let code = "";
+    let color = "";
 
     $Socket.on("info", (info) => {
         infoConnections = info.connections;
         infoConnects = Object.keys(info.connectsTime).length;
+        infoCodes = Object.keys(info.codes).length;
+        infoCodeAttempts = infoCodes
+            ? Object.values(info.codes).reduce((pv, cv) => {
+                  return pv + cv;
+              })
+            : 0;
     });
+
+    $Socket.on("code", (_code, set) => {
+        code = _code || "";
+        set && (color = "#" + code);
+    });
+
+    onMount(() => {
+        window.addEventListener("keypress", (event) => {
+            symbols.includes(event.key) && send(event.key);
+        });
+    });
+
+    function send(symbol) {
+        $Socket.emit("symbol", symbol);
+    }
 </script>
 
 <div class="wrap">
-    <div>
-        <h1><a href="/">MAXQNEI.COM</a></h1>
-        <p class="connection" class:connecting={!$Connected}>{$Connected ? "Connected." : "Connecting..."}</p>
+    <div
+        class="content"
+        style="border-color: {color || 'transparent'}; box-shadow: {color ? `0 0 25px 0 ${color}` : 'transparent'};"
+    >
+        <div>
+            <h1><a href="/">MAXQNEI.COM</a></h1>
+            <p class="connection" class:connecting={!$Connected}>{$Connected ? "Connected." : "Connecting..."}</p>
+        </div>
 
-        {#if infoConnections}
+        {#if $Connected}
             <div class="info">
-                <p>Connections: {infoConnections}</p>
-                <p>Connects: {infoConnects}</p>
+                {#if infoConnections !== undefined}
+                    <p>Connections: {infoConnections}</p>
+                {/if}
+
+                {#if infoConnects !== undefined}
+                    <p>Connects: {infoConnects}</p>
+                {/if}
+
+                {#if infoCodes !== undefined}
+                    <p>Codes: {infoCodes} ({infoCodeAttempts})</p>
+                {/if}
+            </div>
+
+            <div>
+                <div class="code">
+                    {code.padEnd(6, "_").toUpperCase()}
+                </div>
+
+                <div class="symbols">
+                    {#each symbols as symbol}
+                        <button on:click={() => send(symbol)} disabled={code.length >= 6}>
+                            {symbol.toString().toUpperCase()}
+                        </button>
+                    {/each}
+                </div>
             </div>
         {/if}
     </div>
@@ -64,16 +120,22 @@
         text-align: center;
     }
 
+    .content {
+        display: grid;
+        grid-gap: 32px;
+        padding: 32px 32px;
+        border: 0 solid transparent;
+        border-width: 2px 0 2px 0;
+        background-color: rgba(255, 255, 255, 0.15);
+        box-shadow: transparent;
+    }
+
     .connection {
         color: yellowgreen;
     }
     .connection.connecting {
         color: #999999;
         animation: ConnectingAnimation 2s linear infinite;
-    }
-
-    .info {
-        margin-top: 32px;
     }
 
     @keyframes ConnectingAnimation {
@@ -112,14 +174,53 @@
         }
     }
 
+    .code {
+        padding: 8px;
+        letter-spacing: 8px;
+        font-size: 20px;
+        font-family: monospace;
+    }
+
+    .symbols {
+        display: grid;
+        grid-gap: 1px;
+        grid-template-columns: repeat(4, min-content);
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .symbols button {
+        width: 36px;
+        height: 48px;
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        background-color: #1e90ff;
+        color: #d2d2d2;
+        font-size: 16px;
+        cursor: pointer;
+
+        transition: all 250ms ease-in-out;
+    }
+    .symbols button:hover {
+        background-color: #3eb0ff;
+        color: #ffffff;
+    }
+    .symbols button:disabled {
+        background-color: #a0a0a0;
+        color: #cccccc;
+        cursor: not-allowed;
+    }
+
     .links {
-        position: fixed;
+        position: absolute;
         left: 0;
-        bottom: 16px;
+        bottom: 0;
         right: 0;
 
         width: min-content;
         margin: auto;
+        padding: 16px 0;
         display: grid;
         grid-auto-flow: column;
     }
@@ -137,7 +238,7 @@
         text-decoration: none;
         color: white;
 
-        transition: all ease-in-out 250ms;
+        transition: all 250ms ease-in-out;
     }
 
     .links a:hover {
