@@ -2,6 +2,8 @@
 
 ## > Link: [MaxQNEI.com](http://maxqnei.com) <
 
+### > Become a patron: [patreon.com/maxqnei](https://www.patreon.com/maxqnei) <
+
 @Author MaxQNEI
 
 -   [GMail](maxqnei@gmail.com)
