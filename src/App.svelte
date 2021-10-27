@@ -38,81 +38,88 @@
     }
 </script>
 
-<div class="wrap">
-    <div
-        class="content"
-        style="border-color: {color || 'transparent'}; box-shadow: {color ? `0 0 25px 0 ${color}` : 'transparent'};"
-    >
-        <div>
-            <h1><a href="/">MAXQNEI.COM</a></h1>
-            <p class="connection" class:connecting={!$Connected}>{$Connected ? "Connected." : "Connecting..."}</p>
-        </div>
-
-        {#if $Connected}
-            <div class="info">
-                {#if infoConnections !== undefined}
-                    <p>Connections: {infoConnections}</p>
-                {/if}
-
-                {#if infoConnects !== undefined}
-                    <p>Connects: {infoConnects}</p>
-                {/if}
-
-                {#if infoCodes !== undefined}
-                    <p>Codes: {infoCodes} ({infoCodeAttempts})</p>
-                {/if}
-            </div>
-
+<div class="container">
+    <div class="info">
+        <div
+            class="content"
+            style="border-color: {color || 'transparent'}; box-shadow: {color ? `0 0 25px 0 ${color}` : 'transparent'};"
+        >
             <div>
-                <div class="code">
-                    {code.padEnd(6, "_").toUpperCase()}
+                <h1><a href="/">MAXQNEI.COM</a></h1>
+                <p class="connection" class:connecting={!$Connected}>{$Connected ? "Connected." : "Connecting..."}</p>
+            </div>
+
+            {#if $Connected}
+                <div class="info">
+                    {#if infoConnections !== undefined}
+                        <p>Connections: {infoConnections}</p>
+                    {/if}
+
+                    {#if infoConnects !== undefined}
+                        <p>Connects: {infoConnects}</p>
+                    {/if}
+
+                    {#if infoCodes !== undefined}
+                        <p>Codes: {infoCodes} ({infoCodeAttempts})</p>
+                    {/if}
                 </div>
 
-                <div class="symbols">
-                    {#each symbols as symbol}
-                        <button on:click={() => send(symbol)} disabled={code.length >= 6}>
-                            {symbol.toString().toUpperCase()}
-                        </button>
-                    {/each}
+                <div>
+                    <div class="code">
+                        {code.padEnd(6, "_").toUpperCase()}
+                    </div>
+
+                    <div class="symbols">
+                        {#each symbols as symbol}
+                            <button on:click={() => send(symbol)} disabled={code.length >= 6}>
+                                {symbol.toString().toUpperCase()}
+                            </button>
+                        {/each}
+                    </div>
                 </div>
-            </div>
-        {/if}
+            {/if}
+        </div>
+    </div>
+
+    <div class="links">
+        <a href="https://www.patreon.com/maxqnei" target="patreon">
+            <img src="/assets/img/patreon.png" alt="Patreon" />
+            <span>Patreon</span>
+        </a>
+
+        <a href="https://github.com/MaxQNEI/hobby" target="github">
+            <img src="/assets/img/github.png" alt="GitHub" />
+            <span>GitHub</span>
+        </a>
+
+        <a href="https://t.me/maxqnei" target="telegram">
+            <img src="/assets/img/telegram.png" alt="Telegram" />
+            <span>Telegram</span>
+        </a>
+
+        <a href="https://www.facebook.com/maxqnei" target="facebook">
+            <img src="/assets/img/facebook.png" alt="Facebook" />
+            <span>Facebook</span>
+        </a>
     </div>
 </div>
 
-<div class="links">
-    <a href="https://www.patreon.com/maxqnei" target="patreon">
-        <img src="/assets/img/patreon.png" alt="Patreon" />
-        <span>Patreon</span>
-    </a>
-
-    <a href="https://github.com/MaxQNEI/hobby" target="github">
-        <img src="/assets/img/github.png" alt="GitHub" />
-        <span>GitHub</span>
-    </a>
-
-    <a href="https://t.me/maxqnei" target="telegram">
-        <img src="/assets/img/telegram.png" alt="Telegram" />
-        <span>Telegram</span>
-    </a>
-
-    <a href="https://www.facebook.com/maxqnei" target="facebook">
-        <img src="/assets/img/facebook.png" alt="Facebook" />
-        <span>Facebook</span>
-    </a>
-</div>
-
 <style>
-    .wrap {
+    .container {
         width: 100vw;
         height: 100vh;
 
+        display: grid;
+        grid-template-rows: 1fr min-content;
+    }
+
+    .info {
         display: grid;
         justify-content: center;
         align-items: center;
     }
 
-    .wrap > * {
+    .info > * {
         display: grid;
         grid-gap: 8px;
         justify-content: center;
@@ -213,11 +220,6 @@
     }
 
     .links {
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        right: 0;
-
         width: min-content;
         margin: auto;
         padding: 16px 0;
@@ -254,9 +256,8 @@
 
     @media (max-width: 480px) {
         .links {
-            bottom: 0;
-
             width: 100%;
+            padding: 0;
             grid-auto-flow: row;
             grid-template-columns: 1fr 1fr;
         }
